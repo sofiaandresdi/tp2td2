@@ -86,12 +86,12 @@ GameBoard* game_board = NULL;
 
 char* strDuplicate(char* src){
 int i=0;                          
-int tamaño=0;                    
+int largo=0;                    
 while (src[i]!= '\0') {           // recorro hasta el fin del string
-tamaño += 1 ;                    // le sumo uno a tamaño por cada caracter recorrido 
+largo += 1 ;                    // le sumo uno a largo por cada caracter recorrido 
 i++;                             
 }
-char* duplicado= malloc (tamaño +1);   // reservo lugar para los caracteres + el '\0'
+char* duplicado= malloc (largo +1);   // reservo lugar para los caracteres + el '\0'
 int j=0;                          // indice para copiar
 while (src[j]!= '\0') {           // recorro todo el string de nuevo 
 duplicado[j]=src[j];              // copio posicion por posicion el string al duplicado 
@@ -125,25 +125,25 @@ return res;
 
 // ------ strConcatenate ------
 
-// Cuenta el largo de los dos strings y pide tamaño1 + tamaño2 + 1 con malloc para reservar memoria.
+// Cuenta el largo de los dos strings y pide largo1 + largo2 + 1 con malloc para reservar memoria.
 // Copia src1 y despues src2, y cierra con un solo '\0'. Recien despues de copiar
 // hace free de src1 y src2. 
 // El string nuevo lo libera quien la usa.
 
 char* strConcatenate(char* src1, char* src2)  {
-int tamaño1 = 0;                 // largo de src1
-int tamaño2 = 0;                 // largo de src2
+int largo1 = 0;                 // largo de src1
+int largo2 = 0;                 // largo de src2
 int i=0;
 int j =0;
 while(src1[i]!= '\0') {           // cuento los caracteres de src1
-tamaño1 ++;
+largo1 ++;
 i ++;
 }
 while(src2[j]!= '\0') {           // cuento los caracteres de src2
-tamaño2 ++;
+largo2 ++;
 j++;
 }
-char* res = malloc(tamaño1 + tamaño2 + 1);   // lugar para los dos strings + un '\0'
+char* res = malloc(largo1 + largo2 + 1);   // lugar para los dos strings + un '\0'
 int k=0;                          // indice de posicion para res 
 while (src1[k]!= '\0') {          // copio src1 al principio de res
 res[k]=src1[k];
@@ -588,7 +588,7 @@ void correrTests() {
     }
     free(junto);
 
-    // Test de gameBoardEnqueuePiece y gameBoardBequeuePiece
+    // Test de gameBoardEnqueuePiece y gameBoardDequeuePiece
     GameBoard* tablero = gameBoardNew();
     if (tablero == NULL) {
         printf("Tests terminados. gameBoardNew devolvio NULL, no se pudo seguir.\n");
