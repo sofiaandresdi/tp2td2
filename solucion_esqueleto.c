@@ -78,81 +78,98 @@ GameBoard* game_board = NULL;
 
 // ========= EJERCICIO 1: STRINGS (NO USAR string.h) =========
 
+// ------- strDuplicate ------
+
+// cuenta cuantos caracteres tiene el string y pide ese largo + 1 con malloc para reservar memoria 
+// (el +1 es para el '\0' del final). Despues copia caracter por caracter.
+// devuelve una copia nueva, quien la use tiene que hacerle free.
+
 char* strDuplicate(char* src){
-int i=0; 
-int tamaño=0; 
-while (src[i]!= '\0') {
-tamaño += 1 ;
-i++;
+int i=0;                          
+int tamaño=0;                    
+while (src[i]!= '\0') {           // recorro hasta el fin del string
+tamaño += 1 ;                    // le sumo uno a tamaño por cada caracter recorrido 
+i++;                             
 }
-char* duplicado= malloc (tamaño +1);
-int j=0;
-while (src[j]!= '\0') {
-duplicado[j]=src[j];
+char* duplicado= malloc (tamaño +1);   // reservo lugar para los caracteres + el '\0'
+int j=0;                          // indice para copiar
+while (src[j]!= '\0') {           // recorro todo el string de nuevo 
+duplicado[j]=src[j];              // copio posicion por posicion el string al duplicado 
 j ++;
 }
-duplicado[j]= '\0';
-return duplicado;
+duplicado[j]= '\0';               // escribo en la ultima posicion la terminacion del string 
+return duplicado;                 // devuelvo la direccion del string nuevo 
 }
 
-
+// ------ strCompare ------
+// Recorre los dos strings a la vez con un solo indice y frena en la primera
+// letra distinta o cuando s1 se termina. Despues compara esas dos letras.
+// Como '\0' vale 0, un string mas corto ("casa") es menor que el largo ("casas").
+// No usa malloc. Devuelve 0 si son iguales, 1 si s1 es menor y -1 si es mayor.
 
 int strCompare(char* s1, char* s2) {
-int i=0;
-int res=-1;
-while (s1[i]==s2[i] && s1[i]!= '\0') { 
+int i=0;                                      
+int res=-1;                                   // asumo que s1 es mayor
+while (s1[i]==s2[i] && s1[i]!= '\0') {        // sigo mientras sean iguales y no termine s1
 i++;
 }
-if (s1[i]== '\0' && s2[i]== '\0'){
+if (s1[i]== '\0' && s2[i]== '\0'){            // terminaron los dos juntos: son iguales
 res=0;
 }
-if (s1[i]<s2[i]){
+if (s1[i]<s2[i]){                             // en la primera diferencia, s1 tiene el menor
 res=1;
 }
 
 return res;
 }
 
+// ------ strConcatenate ------
 
-
-
-
+// Cuenta el largo de los dos strings y pide tamaño1 + tamaño2 + 1 con malloc para reservar memoria.
+// Copia src1 y despues src2, y cierra con un solo '\0'. Recien despues de copiar
+// hace free de src1 y src2. 
+// El string nuevo lo libera quien la usa.
 
 char* strConcatenate(char* src1, char* src2)  {
-int tamaño1 = 0;
-int tamaño2 = 0;
+int tamaño1 = 0;                 // largo de src1
+int tamaño2 = 0;                 // largo de src2
 int i=0;
 int j =0;
-while(src1[i]!= '\0') {
+while(src1[i]!= '\0') {           // cuento los caracteres de src1
 tamaño1 ++;
 i ++;
 }
-while(src2[j]!= '\0') {
+while(src2[j]!= '\0') {           // cuento los caracteres de src2
 tamaño2 ++;
 j++;
 }
-char* res = malloc(tamaño1 + tamaño2 + 1);
-int k=0;
-while (src1[k]!= '\0') {
+char* res = malloc(tamaño1 + tamaño2 + 1);   // lugar para los dos strings + un '\0'
+int k=0;                          // indice de posicion para res 
+while (src1[k]!= '\0') {          // copio src1 al principio de res
 res[k]=src1[k];
 k ++;
 }
-int m=0;
-while(src2[m]!= '\0') {
+int m=0;                          // m = donde leo en src2 
+while(src2[m]!= '\0') {           // copio src2 a continuacion de src1, por eso sigo utilizando k 
 res[k]=src2[m];
 k ++;
 m ++;
 }
-free(src1);
+free(src1);                       // libero los argumentos ya que ya se copiaron
 free(src2);
-res[k]= '\0';
+res[k]= '\0';                     // cierro el string nuevo con su '\0'
 return res;
 }
 
-
-
 // ========= EJERCICIO 2: FUNCIONES A IMPLEMENTAR (EL TP) =========
 void gameBoardDelete(GameBoard*);
+
+// ------ gameBoardNew ------
+
+// Pide memoria para el tablero y para las 20 filas, una por una. Cada fila nueva se
+// pone al principio de la lista, asi la primera que se crea queda al final con next NULL.
+// malloc no pone nada en cero, asi que todo se inicializa a mano (celdas en 0, punteros en NULL).
+// Si un malloc falla, se libera lo que ya se pidio con gameBoardDelete y se devuelve NULL.
 
 GameBoard* gameBoardNew() {
      GameBoard* tablero = (GameBoard*) malloc(sizeof(GameBoard)); //pido memoria para un tablero
@@ -188,8 +205,12 @@ GameBoard* gameBoardNew() {
 
 
 
-   
+// ------ gameBoardDelete ------
 
+// Recorre cada lista y libera nodo por nodo.
+// Antes de hacer free se guarda el next, porque despues del free el nodo ya no se puede leer.
+// El tablero se libera al final, cuando ya no hace falta usarlo.
+   
 void gameBoardDelete(GameBoard* board) {
       if (board == NULL) return;                  // si me pasan NULL, no hay nada que liberar
 
@@ -218,8 +239,11 @@ void gameBoardDelete(GameBoard* board) {
 }
 
 
+// ------ gameBoardAddParticle ------
 
-
+// Pide memoria para una particula, le pone posicion, velocidad al azar, color y cuanto durara,
+// y la agrega al principio de la lista (la nueva apunta a la que era primera).
+// Si malloc falla, no hace nada: es solo un efecto visual y el juego sigue.
 
 void gameBoardAddParticle(GameBoard* board, float x, float y, int color) {
     if (board == NULL) return;                  // si no hay tablero, no hago nada
@@ -238,9 +262,17 @@ void gameBoardAddParticle(GameBoard* board, float x, float y, int color) {
     board->first_particle = particulaNueva;     // la nueva pasa a ser la primera
 }
 
-int gameBoardCheckAndClearLines(GameBoard* board) {   if (board == NULL) return 0;                // si no hay tablero, borré 0 filas
+// ------ gameBoardCheckAndClearLines ------
 
-    int borradas = 0;                           // cuántas filas borré
+// Recorre las filas con dos punteros: fila (la que se revisa) y anterior (la ultima que
+// se dejo). Si una fila esta completa, crea una particula por celda, la saca de la lista
+// (anterior salta a la siguiente; si era la primera, se cambia first_row) y le hace free.
+// Despues de recorrer, agrega una fila vacia al principio por cada una borrada,
+// asi siempre quedan 20 filas. Devuelve cuantas se borraron.
+
+int gameBoardCheckAndClearLines(GameBoard* board) {   
+    if (board == NULL) return 0;                // si no hay tablero, borre 0 filas
+    int borradas = 0;                           // cuántas filas borre
     int numeroFila = 0;                         // en qué número de fila estoy (0 es la de arriba)
     RowNode* anterior = NULL;                   // la última fila que dejé en la lista
     RowNode* fila = board->first_row;           // el "dedo" arranca en la primera fila
@@ -286,7 +318,10 @@ int gameBoardCheckAndClearLines(GameBoard* board) {   if (board == NULL) return 
     return borradas;                            // devuelvo cuántas filas borré
 }
 
+// ------ gameBoardEnqueuePiece ------
 
+// Agrega una pieza al final de la cola. Se usa queue_tail para no recorrer toda la cola.
+// Si la cola estaba vacia, la pieza nueva es a la vez head y tail.
 
 void gameBoardEnqueuePiece(GameBoard* board, int type) {
     if (board == NULL) return;                  // si no hay tablero, no hago nada
@@ -306,7 +341,11 @@ void gameBoardEnqueuePiece(GameBoard* board, int type) {
 }
 
 
+// ------ gameBoardDequeuePiece ------
 
+// Saca la pieza del principio de la cola (head) y guarda su tipo en out_type.
+// Si era la ultima, queue_tail tambien pasa a NULL (si no, apuntaria a memoria liberada).
+// Si la cola esta vacia, devuelve 0 y no toca out_type. Despues libera el nodo con free.
 
 int gameBoardDequeuePiece(GameBoard* board, int* out_type) {
     if (board == NULL || board->queue_head == NULL) return 0; // fila vacía: devuelvo 0 y no toco out_type
